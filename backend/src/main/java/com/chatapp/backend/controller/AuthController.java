@@ -59,4 +59,10 @@ public class AuthController {
     }
 
 
+    @GetMapping("/check-username")
+    public boolean checkUsernameAvailability(@RequestParam String username) {
+        return authService.isUsernameAvailable(username);
+    }
+
+
 }
