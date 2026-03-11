@@ -68,8 +68,9 @@ public class AuthService {
         }
 
         String token = jwtUtil.generateToken(user.getUsername());
+        long userID=user.getId();
 
-        return new AuthResponse(token);
+        return new AuthResponse(token,userID);
     }
 
 
@@ -93,5 +94,10 @@ public class AuthService {
         emailService.sendWelcomeEmail(record.getEmail(), record.getUsername());
 
         return "Signup successful";
+    }
+
+
+    public boolean isUsernameAvailable(String username) {
+        return !userRepository.existsByUsername(username);
     }
 }

@@ -1,16 +1,22 @@
 package com.chatapp.backend.service;
 
 import com.chatapp.backend.dto.ConversationDTO;
+import com.chatapp.backend.dto.MessageResponseDTO;
 import com.chatapp.backend.entity.Conversation;
 import com.chatapp.backend.entity.Message;
 import com.chatapp.backend.entity.User;
 import com.chatapp.backend.repository.ConversationRepository;
 import com.chatapp.backend.repository.MessageRepository;
 import com.chatapp.backend.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -74,4 +80,33 @@ public class ChatService {
 
         return result;
     }
+
+
+
+    public List<MessageResponseDTO> getMessages(Long conversationId, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
+        Page<Message> messagePage =
+                messageRepository.findByConversationId(conversationId, pageable);
+
+        List<Message> messages = messagePage.getContent();
+
+        Collections.reverse(messages); // oldest → newest for UI
+
+        List<MessageResponseDTO> response = new ArrayList<>();
+
+        for (Message message : messages) {
+            response.add(new MessageResponseDTO(
+                    message.getId(),
+                    message.getSenderId(),
+                    message.getContent(),
+                    message.getStatus(),
+                    message.getCreatedAt()
+            ));
+        }
+
+        return response;
+    };
+
 }
